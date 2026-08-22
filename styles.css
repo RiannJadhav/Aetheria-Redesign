@@ -249,43 +249,77 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
-  background: var(--onyx);
+  background: var(--ivory);
 }
+
+/* alternate the field tone per product so the four feel distinct,
+   while staying inside the same restrained palette */
+.product-stage[data-product="onyx"]   .stage-media { --field: var(--champagne-soft); background: var(--ivory-deep); }
+.product-stage[data-product="pearl"]  .stage-media { --field: var(--stone);          background: var(--ivory); }
+.product-stage[data-product="grigio"] .stage-media { --field: var(--champagne);      background: var(--ivory-deep); }
+.product-stage[data-product="duo"]    .stage-media { --field: var(--champagne-soft); background: var(--ivory); }
 
 .product-stage .stage-media {
   position: relative;
   overflow: hidden;
-  background: var(--charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.product-stage .stage-media img {
+/* the soft blurred field of colour behind each product */
+.stage-media .stage-circle {
+  position: absolute;
+  width: min(58vw, 620px);
+  height: min(58vw, 620px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, var(--field) 0%, transparent 72%);
+  filter: blur(6px);
+  opacity: 0;
+  transform: scale(0.82);
+  transition: opacity 1200ms var(--ease) 100ms, transform 1400ms var(--ease) 100ms;
+}
+.product-stage.is-active .stage-media .stage-circle {
+  opacity: 0.9;
+  transform: scale(1);
+}
+
+/* the product photo itself: feathered edges + a multiply blend melt the
+   white studio backdrop into the page, so no photo cutout is required */
+.stage-product-figure {
+  position: relative;
+  z-index: 2;
+  width: min(64%, 460px);
+  aspect-ratio: 4/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-product-figure img {
   width: 100%;
-  height: 112%;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.08) translateY(var(--parallax-y, 0px));
-  filter: saturate(0.8) contrast(1.0) blur(6px);
-  transition: transform 1500ms var(--ease), filter 1300ms var(--ease);
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(closest-side, black 58%, transparent 96%);
+  mask-image: radial-gradient(closest-side, black 58%, transparent 96%);
+  transform: scale(1.1) translateY(var(--parallax-y, 0px));
+  filter: saturate(0.86) contrast(1.02) blur(6px);
+  transition: transform 1500ms var(--ease), filter 1300ms var(--ease), opacity 1000ms var(--ease);
+  opacity: 0;
   will-change: transform, filter;
 }
 
-.product-stage.is-active .stage-media img {
+.product-stage.is-active .stage-product-figure img {
   transform: scale(1) translateY(var(--parallax-y, 0px));
-  filter: saturate(0.92) contrast(1.03) blur(0px);
+  filter: saturate(0.98) contrast(1.04) blur(0px);
+  opacity: 1;
 }
 
 /* once a panel has fully arrived, hand transform control to the
    scroll-driven parallax loop, but keep the focus-pull transition intact */
-.product-stage.parallax-live .stage-media img {
-  transition: filter 1300ms var(--ease);
-}
-
-/* unify disparate catalog photography with a consistent tonal wash */
-.stage-media::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(11,10,8,0.15) 0%, rgba(11,10,8,0.05) 40%, rgba(11,10,8,0.55) 100%);
-  pointer-events: none;
+.product-stage.parallax-live .stage-product-figure img {
+  transition: filter 1300ms var(--ease), opacity 1000ms var(--ease);
 }
 
 .stage-copy {
@@ -293,7 +327,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   flex-direction: column;
   justify-content: center;
   padding: 0 clamp(32px, 6vw, 90px);
-  color: var(--cream-text);
+  color: var(--ink);
   position: relative;
 }
 
@@ -301,7 +335,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   font-family: var(--font-sans);
   font-size: 12px;
   letter-spacing: 0.2em;
-  color: var(--champagne-soft);
+  color: var(--champagne);
   margin-bottom: 26px;
   opacity: 0;
   transform: translateY(10px);
@@ -323,7 +357,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 .stage-copy .stage-line {
   font-size: 15px;
   font-weight: 400;
-  color: var(--stone);
+  color: #5b564c;
   max-width: 34ch;
   line-height: 1.5;
   margin-bottom: 34px;
@@ -335,7 +369,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 .stage-copy .stage-price {
   font-size: 13px;
   letter-spacing: 0.08em;
-  color: var(--champagne-soft);
+  color: var(--champagne);
   margin-bottom: 34px;
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease) 400ms;
@@ -350,13 +384,13 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   text-transform: uppercase;
   font-weight: 500;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(244,240,229,0.35);
+  border-bottom: 1px solid var(--stone-line);
   width: fit-content;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity var(--dur-slow) var(--ease) 460ms, transform var(--dur-slow) var(--ease) 460ms, border-color var(--dur-fast) ease;
 }
-.discover-link:hover { border-color: var(--champagne); color: var(--champagne-soft); }
+.discover-link:hover { border-color: var(--champagne); color: var(--champagne); }
 .discover-link .arrow { transition: transform var(--dur-fast) var(--ease); }
 .discover-link:hover .arrow { transform: translateX(4px); }
 
@@ -377,7 +411,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   font-family: var(--font-sans);
   font-size: 11px;
   letter-spacing: 0.24em;
-  color: rgba(244,240,229,0.55);
+  color: #8a8474;
   text-transform: uppercase;
 }
 
@@ -425,7 +459,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   bottom: 36px;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(244,240,229,0.55);
+  color: #8a8474;
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -439,7 +473,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 .product-stage.is-active .scroll-cue { opacity: 1; }
 .scroll-cue .line {
   width: 1px; height: 26px;
-  background: rgba(244,240,229,0.4);
+  background: var(--stone-line);
   animation: cueMove 2.2s var(--ease) infinite;
 }
 @keyframes cueMove {
@@ -1075,6 +1109,8 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .stage-copy { padding: 34px 22px 40px; }
   .stage-copy .stage-name { font-size: clamp(34px, 9vw, 50px); }
   .stage-house-mark { top: 20px; }
+  .stage-media .stage-circle { width: min(70vw, 380px); height: min(70vw, 380px); }
+  .stage-product-figure { width: min(72%, 320px); }
 
   .house-origin { flex-wrap: wrap; gap: 30px; }
 
@@ -1106,7 +1142,8 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .discover-link,
   .house-statement, .house-sub, .house-origin div,
   .grid-card { opacity: 1 !important; transform: none !important; }
-  .product-stage .stage-media img { transform: none !important; filter: saturate(0.92) contrast(1.03) !important; height: 100%; }
+  .product-stage .stage-product-figure img { transform: none !important; filter: saturate(0.98) contrast(1.04) !important; opacity: 1 !important; }
+  .stage-media .stage-circle { transition: none; opacity: 0.9; transform: scale(1); }
   body.curtain-lifted .entrance-curtain,
   .entrance-curtain { transition: opacity 1ms linear; }
 }
