@@ -263,21 +263,21 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   height: 112%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.06) translateY(var(--parallax-y, 0px));
-  filter: saturate(0.92) contrast(1.03);
-  transition: transform 1400ms var(--ease);
-  will-change: transform;
+  transform: scale(1.08) translateY(var(--parallax-y, 0px));
+  filter: saturate(0.8) contrast(1.0) blur(6px);
+  transition: transform 1500ms var(--ease), filter 1300ms var(--ease);
+  will-change: transform, filter;
 }
 
 .product-stage.is-active .stage-media img {
   transform: scale(1) translateY(var(--parallax-y, 0px));
-  transition: transform 1400ms var(--ease);
+  filter: saturate(0.92) contrast(1.03) blur(0px);
 }
 
 /* once a panel has fully arrived, hand transform control to the
-   scroll-driven parallax loop (no competing transitions) */
+   scroll-driven parallax loop, but keep the focus-pull transition intact */
 .product-stage.parallax-live .stage-media img {
-  transition: none;
+  transition: filter 1300ms var(--ease);
 }
 
 /* unify disparate catalog photography with a consistent tonal wash */
@@ -286,36 +286,6 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(11,10,8,0.15) 0%, rgba(11,10,8,0.05) 40%, rgba(11,10,8,0.55) 100%);
   pointer-events: none;
-}
-
-/* soft light-sweep — a restrained echo of "light moving across glass",
-   done as a single CSS gradient pass rather than a shader */
-.stage-media::before {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 40%,
-    rgba(212, 197, 168, 0.16) 49%,
-    rgba(244, 240, 229, 0.22) 50%,
-    rgba(212, 197, 168, 0.16) 51%,
-    transparent 60%
-  );
-  transform: translateX(-60%);
-  opacity: 0;
-}
-
-.product-stage.is-active .stage-media::before {
-  animation: lightSweep 2000ms var(--ease) 150ms forwards;
-}
-
-@keyframes lightSweep {
-  0%   { transform: translateX(-60%); opacity: 0; }
-  35%  { opacity: 1; }
-  100% { transform: translateX(30%); opacity: 0; }
 }
 
 .stage-copy {
@@ -993,8 +963,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .discover-link,
   .house-statement, .house-sub, .house-origin div,
   .grid-card { opacity: 1 !important; transform: none !important; }
-  .product-stage .stage-media img { transform: none !important; height: 100%; }
-  .stage-media::before { display: none; }
+  .product-stage .stage-media img { transform: none !important; filter: saturate(0.92) contrast(1.03) !important; height: 100%; }
   body.curtain-lifted .entrance-curtain,
   .entrance-curtain { transition: opacity 1ms linear; }
 }
