@@ -202,7 +202,7 @@ function initParallax() {
     const viewportMid = stage.scrollTop + stage.clientHeight / 2;
 
     panels.forEach((panel) => {
-      const img = panel.querySelector(".stage-media img");
+      const img = panel.querySelector(".stage-product-figure img");
       if (!img) return;
       const panelMid = panel.offsetTop + panel.offsetHeight / 2;
       const offset = (viewportMid - panelMid) * PARALLAX_STRENGTH;
