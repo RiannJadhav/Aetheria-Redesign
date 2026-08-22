@@ -7,9 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initNavTheme();
   initMobileDrawer();
   initRevealOnScroll();
+  initHeroScrollCue();
   initCollectionExperience();
   initParallax();
   initBagPlaceholder();
+  renderLookbook();
 });
 
 /* ---------- Entrance: brief curtain so the first frame feels considered ---------- */
@@ -26,19 +28,20 @@ function initEntranceCurtain() {
   requestAnimationFrame(() => document.body.classList.add("curtain-ready"));
 
   const lift = () => document.body.classList.add("curtain-lifted");
-  // lift once the first hero image is decoded, or after a short cap either way —
-  // whichever comes first, so a slow image never traps the visitor behind the curtain
-  const heroImg = document.querySelector('.product-stage[data-product] .stage-media img');
-  const capTimer = setTimeout(lift, 1400);
-  if (heroImg && heroImg.complete) {
-    clearTimeout(capTimer);
-    setTimeout(lift, 500);
-  } else if (heroImg) {
-    heroImg.addEventListener("load", () => {
-      clearTimeout(capTimer);
-      setTimeout(lift, 350);
-    }, { once: true });
-  }
+  // the first view is the brand hero (type, not an image), so there's no
+  // media to wait on here — a short fixed hold is enough for it to read
+  // as a considered arrival rather than a flash of content
+  setTimeout(lift, 1000);
+}
+
+/* ---------- Hero: click-to-scroll into the collection ---------- */
+function initHeroScrollCue() {
+  const cue = document.querySelector("[data-scroll-to-collection]");
+  const target = document.querySelector(".collection-experience");
+  if (!cue || !target) return;
+  cue.addEventListener("click", () => {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 /* ---------- Nav: solid on scroll + light/dark theme per section ---------- */
@@ -46,17 +49,18 @@ function initNavTheme() {
   const nav = document.querySelector(".site-nav");
   if (!nav) return;
 
-  const scrollHost = document.querySelector(".collection-experience") || window;
-  const getScrollTop = () =>
-    scrollHost === window ? window.scrollY : scrollHost.scrollTop;
+  const nestedScroller = document.querySelector(".collection-experience");
 
   const onScroll = () => {
-    nav.classList.toggle("scrolled", getScrollTop() > 40);
+    const nestedTop = nestedScroller ? nestedScroller.scrollTop : 0;
+    nav.classList.toggle("scrolled", window.scrollY > 40 || nestedTop > 40);
   };
-  scrollHost.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("scroll", onScroll, { passive: true });
+  if (nestedScroller) nestedScroller.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // sections can opt into a light nav via [data-nav-theme="light"]
+  // sections opt into a light nav via [data-nav-theme="light"]; observed
+  // against the real viewport since these sections sit in normal page flow
   const themedSections = document.querySelectorAll("[data-nav-theme]");
   if (themedSections.length) {
     const io = new IntersectionObserver(
@@ -68,7 +72,7 @@ function initNavTheme() {
           }
         });
       },
-      { rootMargin: "-50% 0px -50% 0px", root: scrollHost === window ? null : scrollHost }
+      { rootMargin: "-50% 0px -50% 0px" }
     );
     themedSections.forEach((s) => io.observe(s));
   }
@@ -112,6 +116,7 @@ function initCollectionExperience() {
 
   const panels = Array.from(stage.querySelectorAll(".product-stage"));
   const indexButtons = Array.from(document.querySelectorAll(".stage-nav-index button"));
+  const sideIndex = document.querySelector(".stage-nav-index");
 
   const io = new IntersectionObserver(
     (entries) => {
@@ -128,6 +133,20 @@ function initCollectionExperience() {
     { root: stage, threshold: [0, 0.6, 1] }
   );
   panels.forEach((p) => io.observe(p));
+
+  // the fixed 01–04 index only makes sense while the journey itself
+  // is on screen — hide it over the brand hero and everything below
+  if (sideIndex) {
+    const visibilityIo = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          sideIndex.classList.toggle("visible", entry.isIntersecting);
+        });
+      },
+      { threshold: 0.15 }
+    );
+    visibilityIo.observe(stage);
+  }
 
   indexButtons.forEach((btn, i) => {
     btn.addEventListener("click", () => {
@@ -149,6 +168,23 @@ function initCollectionExperience() {
     if (e.key === "ArrowUp") next = Math.max(current - 1, 0);
     panels[next].scrollIntoView({ behavior: "smooth", block: "start" });
   });
+}
+
+/* ---------- Lookbook: renders from AETHERIA_GALLERY in data.js ---------- */
+function renderLookbook() {
+  const grid = document.querySelector("[data-lookbook-grid]");
+  if (!grid || typeof AETHERIA_GALLERY === "undefined") return;
+
+  if (!AETHERIA_GALLERY.length) {
+    grid.innerHTML = `<div class="lookbook-empty">Campaign photography is being added here soon.</div>`;
+    return;
+  }
+
+  grid.innerHTML = AETHERIA_GALLERY.map((shot) => `
+    <a href="${shot.link || '#'}" aria-label="${shot.alt || ''}">
+      <img src="${shot.image}" alt="${shot.alt || ''}" loading="lazy">
+    </a>
+  `).join("");
 }
 
 /* ---------- Parallax: image drifts slower than the scroll, for depth ---------- */
