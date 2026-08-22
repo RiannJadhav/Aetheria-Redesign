@@ -252,12 +252,12 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   background: var(--ivory);
 }
 
-/* alternate the field tone per product so the four feel distinct,
-   while staying inside the same restrained palette */
-.product-stage[data-product="onyx"]   .stage-media { --field: var(--champagne-soft); background: var(--ivory-deep); }
-.product-stage[data-product="pearl"]  .stage-media { --field: var(--stone);          background: var(--ivory); }
-.product-stage[data-product="grigio"] .stage-media { --field: var(--champagne);      background: var(--ivory-deep); }
-.product-stage[data-product="duo"]    .stage-media { --field: var(--champagne-soft); background: var(--ivory); }
+/* each product gets its own quiet, flat panel tone — a colour
+   identity with zero risk of muddying real photography */
+.product-stage[data-product="onyx"]   .stage-media { background: #EAE2D0; }
+.product-stage[data-product="pearl"]  .stage-media { background: #F0E9DC; }
+.product-stage[data-product="grigio"] .stage-media { background: #E6DFCF; }
+.product-stage[data-product="duo"]    .stage-media { background: #EEE1C9; }
 
 .product-stage .stage-media {
   position: relative;
@@ -267,59 +267,39 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   justify-content: center;
 }
 
-/* the soft blurred field of colour behind each product */
-.stage-media .stage-circle {
-  position: absolute;
-  width: min(58vw, 620px);
-  height: min(58vw, 620px);
-  border-radius: 50%;
-  background: radial-gradient(circle at 42% 38%, var(--field) 0%, transparent 72%);
-  filter: blur(6px);
-  opacity: 0;
-  transform: scale(0.82);
-  transition: opacity 1200ms var(--ease) 100ms, transform 1400ms var(--ease) 100ms;
-}
-.product-stage.is-active .stage-media .stage-circle {
-  opacity: 0.9;
-  transform: scale(1);
-}
-
-/* the product photo itself: feathered edges + a multiply blend melt the
-   white studio backdrop into the page, so no photo cutout is required */
+/* the product photo, presented plainly as a card resting on the panel —
+   no blend mode, no masking: the photo is never asked to render
+   differently than it actually looks */
 .stage-product-figure {
   position: relative;
   z-index: 2;
-  width: min(64%, 460px);
-  aspect-ratio: 4/5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: min(60%, 460px);
+  opacity: 0;
+  transform: scale(1.05) translateY(var(--parallax-y, 0px));
+  transition: transform 1500ms var(--ease), opacity 1000ms var(--ease);
+  will-change: transform, opacity;
+}
+
+.product-stage.is-active .stage-product-figure {
+  opacity: 1;
+  transform: scale(1) translateY(var(--parallax-y, 0px));
 }
 
 .stage-product-figure img {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  mix-blend-mode: multiply;
-  -webkit-mask-image: radial-gradient(closest-side, black 58%, transparent 96%);
-  mask-image: radial-gradient(closest-side, black 58%, transparent 96%);
-  transform: scale(1.1) translateY(var(--parallax-y, 0px));
-  filter: saturate(0.86) contrast(1.02) blur(6px);
-  transition: transform 1500ms var(--ease), filter 1300ms var(--ease), opacity 1000ms var(--ease);
-  opacity: 0;
-  will-change: transform, filter;
-}
-
-.product-stage.is-active .stage-product-figure img {
-  transform: scale(1) translateY(var(--parallax-y, 0px));
-  filter: saturate(0.98) contrast(1.04) blur(0px);
-  opacity: 1;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+  box-shadow:
+    0 40px 70px -30px rgba(27, 23, 18, 0.28),
+    0 10px 24px -10px rgba(27, 23, 18, 0.14);
+  filter: saturate(0.94) contrast(1.03);
 }
 
 /* once a panel has fully arrived, hand transform control to the
-   scroll-driven parallax loop, but keep the focus-pull transition intact */
-.product-stage.parallax-live .stage-product-figure img {
-  transition: filter 1300ms var(--ease), opacity 1000ms var(--ease);
+   scroll-driven parallax loop */
+.product-stage.parallax-live .stage-product-figure {
+  transition: opacity 1000ms var(--ease);
 }
 
 .stage-copy {
@@ -1109,7 +1089,6 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .stage-copy { padding: 34px 22px 40px; }
   .stage-copy .stage-name { font-size: clamp(34px, 9vw, 50px); }
   .stage-house-mark { top: 20px; }
-  .stage-media .stage-circle { width: min(70vw, 380px); height: min(70vw, 380px); }
   .stage-product-figure { width: min(72%, 320px); }
 
   .house-origin { flex-wrap: wrap; gap: 30px; }
@@ -1142,8 +1121,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .discover-link,
   .house-statement, .house-sub, .house-origin div,
   .grid-card { opacity: 1 !important; transform: none !important; }
-  .product-stage .stage-product-figure img { transform: none !important; filter: saturate(0.98) contrast(1.04) !important; opacity: 1 !important; }
-  .stage-media .stage-circle { transition: none; opacity: 0.9; transform: scale(1); }
+  .product-stage .stage-product-figure { transform: none !important; opacity: 1 !important; }
   body.curtain-lifted .entrance-curtain,
   .entrance-curtain { transition: opacity 1ms linear; }
 }
