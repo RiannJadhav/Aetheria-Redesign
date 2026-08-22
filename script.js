@@ -3,12 +3,43 @@
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initEntranceCurtain();
   initNavTheme();
   initMobileDrawer();
   initRevealOnScroll();
   initCollectionExperience();
+  initParallax();
   initBagPlaceholder();
 });
+
+/* ---------- Entrance: brief curtain so the first frame feels considered ---------- */
+function initEntranceCurtain() {
+  const curtain = document.querySelector(".entrance-curtain");
+  if (!curtain) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    document.body.classList.add("curtain-lifted");
+    return;
+  }
+
+  requestAnimationFrame(() => document.body.classList.add("curtain-ready"));
+
+  const lift = () => document.body.classList.add("curtain-lifted");
+  // lift once the first hero image is decoded, or after a short cap either way —
+  // whichever comes first, so a slow image never traps the visitor behind the curtain
+  const heroImg = document.querySelector('.product-stage[data-product] .stage-media img');
+  const capTimer = setTimeout(lift, 1400);
+  if (heroImg && heroImg.complete) {
+    clearTimeout(capTimer);
+    setTimeout(lift, 500);
+  } else if (heroImg) {
+    heroImg.addEventListener("load", () => {
+      clearTimeout(capTimer);
+      setTimeout(lift, 350);
+    }, { once: true });
+  }
+}
 
 /* ---------- Nav: solid on scroll + light/dark theme per section ---------- */
 function initNavTheme() {
@@ -118,6 +149,43 @@ function initCollectionExperience() {
     if (e.key === "ArrowUp") next = Math.max(current - 1, 0);
     panels[next].scrollIntoView({ behavior: "smooth", block: "start" });
   });
+}
+
+/* ---------- Parallax: image drifts slower than the scroll, for depth ---------- */
+function initParallax() {
+  const stage = document.querySelector(".collection-experience");
+  if (!stage) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const panels = Array.from(stage.querySelectorAll(".product-stage"));
+  const PARALLAX_STRENGTH = 0.14; // fraction of scroll delta the image drifts by
+  let ticking = false;
+
+  const apply = () => {
+    ticking = false;
+    const viewportMid = stage.scrollTop + stage.clientHeight / 2;
+
+    panels.forEach((panel) => {
+      const img = panel.querySelector(".stage-media img");
+      if (!img) return;
+      const panelMid = panel.offsetTop + panel.offsetHeight / 2;
+      const offset = (viewportMid - panelMid) * PARALLAX_STRENGTH;
+      // clamp so the oversized image (112% height) never shows a gap at the edge
+      const clamped = Math.max(-40, Math.min(40, offset));
+      img.style.setProperty("--parallax-y", `${clamped}px`);
+      panel.classList.add("parallax-live");
+    });
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      requestAnimationFrame(apply);
+      ticking = true;
+    }
+  };
+
+  stage.addEventListener("scroll", onScroll, { passive: true });
+  apply();
 }
 
 /* ---------- Cart placeholder: visual bag count, no real checkout yet ---------- */
