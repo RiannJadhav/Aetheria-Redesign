@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-page-title>House of Aetheria</title>
+<meta name="description" content="Shop House of Aetheria makeup brush sets.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="site-nav theme-light">
+  <a href="index.html" class="nav-word">Aetheria</a>
+  <ul class="nav-links">
+    <li><a href="index.html#house">The House</a></li>
+    <li><a href="index.html#collection">Collection</a></li>
+    <li><a href="index.html#journal">Journal</a></li>
+  </ul>
+  <div class="nav-right">
+    <button aria-label="Search">Search</button>
+    <a href="#" aria-label="Bag">Bag<span class="bag-count" data-bag-count>0</span></a>
+  </div>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-drawer">
+  <a href="index.html#house">The House</a>
+  <a href="index.html#collection">Collection</a>
+  <a href="index.html#journal">Journal</a>
+</div>
+
+<main class="product-page-main" id="pdp-root">
+  <!-- filled by script below -->
+</main>
+
+<footer class="site-footer">
+  <div class="footer-top">
+    <div>
+      <div class="footer-word">Aetheria</div>
+      <p style="max-width:32ch; line-height:1.6;">A digital beauty house headquartered in Dubai, U.A.E.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="product.html?id=onyx">Onyx</a>
+        <a href="product.html?id=pearl">Pearl</a>
+        <a href="product.html?id=grigio">Grigio</a>
+        <a href="product.html?id=duo">Dubai Duo</a>
+      </div>
+      <div class="footer-col">
+        <h4>House</h4>
+        <a href="index.html#house">The House</a>
+        <a href="index.html#journal">Journal</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Care</h4>
+        <a href="#">Shipping</a>
+        <a href="#">Returns</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 House of Aetheria</span>
+    <span>Dubai, U.A.E.</span>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script>
+  function renderProductPage() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id") || "onyx";
+    const p = aetheriaGetProduct(id);
+    const root = document.getElementById("pdp-root");
+
+    if (!p) {
+      root.innerHTML = "<div style='padding:160px 24px; text-align:center;'><p>That set isn't in the collection. <a href='index.html' style='text-decoration:underline;'>Return to the collection.</a></p></div>";
+      return;
+    }
+
+    document.querySelector("[data-page-title]").textContent = p.fullName + " — House of Aetheria";
+
+    const related = AETHERIA_PRODUCTS.filter((x) => x.id !== p.id).slice(0, 3);
+
+    root.innerHTML = `
+      <div class="pdp-layout">
+        <div class="pdp-gallery">
+          <div class="pdp-hero-img">
+            <img src="${p.gallery[0]}" alt="${p.fullName}" data-hero-img>
+          </div>
+          ${p.gallery.length > 1 ? `
+          <div class="pdp-thumbs">
+            ${p.gallery.map((src, i) => `
+              <button data-thumb="${src}" class="${i === 0 ? "active" : ""}">
+                <img src="${src}" alt="">
+              </button>
+            `).join("")}
+          </div>` : ""}
+        </div>
+
+        <div class="pdp-info">
+          <div class="pdp-crumb">${p.index} / The Collection</div>
+          <h1>${p.name}</h1>
+          <p class="pdp-tagline">${p.tagline}</p>
+          <div class="pdp-price">${p.priceDisplay}</div>
+          <div class="pdp-stars">
+            <span class="stars">★★★★★</span>
+            <span>${p.reviews.length} reviews</span>
+          </div>
+
+          <div class="pdp-buybox">
+            <div class="qty-stepper">
+              <button data-qty-minus aria-label="Decrease quantity">−</button>
+              <span data-qty-value>1</span>
+              <button data-qty-plus aria-label="Increase quantity">+</button>
+            </div>
+            <button class="add-to-bag" data-add-to-bag>Add to Bag</button>
+          </div>
+          <p class="pdp-note">Checkout opens in a later phase — this is the visual experience for review.</p>
+
+          <div class="pdp-accordion">
+            <div class="acc-item open">
+              <button class="acc-head">Description <span class="plus">+</span></button>
+              <div class="acc-body"><div class="acc-body-inner">${p.description}</div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">What's Included <span class="plus">+</span></button>
+              <div class="acc-body"><div class="acc-body-inner">${p.included.map(i => `— ${i}`).join("<br>")}</div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">How to Use <span class="plus">+</span></button>
+              <div class="acc-body"><div class="acc-body-inner">${p.howToUse}</div></div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Shipping <span class="plus">+</span></button>
+              <div class="acc-body"><div class="acc-body-inner">Calculated at checkout. Dispatched from Dubai, U.A.E.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="pdp-reviews">
+        <div class="rev-head">
+          <h2>What customers are saying</h2>
+        </div>
+        <div class="review-grid">
+          ${p.reviews.map(r => `
+            <div class="review-card">
+              <div class="stars">★★★★★</div>
+              <p>${r.text}</p>
+              <div class="name">${r.name}</div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="related-section">
+        <span class="eyebrow">Continue the Collection</span>
+        <h2>You may also like</h2>
+        <div class="related-grid">
+          ${related.map(r => `
+            <a href="product.html?id=${r.id}" class="grid-card">
+              <div class="thumb"><img src="${r.gallery[0]}" alt="${r.fullName}"></div>
+              <span class="g-index">${r.index} — ${r.name}</span>
+              <h3 class="g-name">${r.name}</h3>
+              <p class="g-line">${r.tagline}</p>
+              <div class="g-price"><span>${r.priceDisplay}</span><span class="view">View →</span></div>
+            </a>
+          `).join("")}
+        </div>
+      </section>
+    `;
+
+    initProductPageWidgets();
+    initBagPlaceholder();
+  }
+
+  document.addEventListener("DOMContentLoaded", renderProductPage);
+</script>
+</body>
+</html>
