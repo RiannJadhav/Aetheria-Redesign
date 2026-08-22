@@ -202,13 +202,13 @@ function initParallax() {
     const viewportMid = stage.scrollTop + stage.clientHeight / 2;
 
     panels.forEach((panel) => {
-      const img = panel.querySelector(".stage-product-figure img");
-      if (!img) return;
+      const figure = panel.querySelector(".stage-product-figure");
+      if (!figure) return;
       const panelMid = panel.offsetTop + panel.offsetHeight / 2;
       const offset = (viewportMid - panelMid) * PARALLAX_STRENGTH;
       // clamp so the oversized image (112% height) never shows a gap at the edge
       const clamped = Math.max(-40, Math.min(40, offset));
-      img.style.setProperty("--parallax-y", `${clamped}px`);
+      figure.style.setProperty("--parallax-y", `${clamped}px`);
       panel.classList.add("parallax-live");
     });
   };
