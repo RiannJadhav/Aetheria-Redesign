@@ -94,3 +94,21 @@ const AETHERIA_PRODUCTS = [
 function aetheriaGetProduct(id) {
   return AETHERIA_PRODUCTS.find(p => p.id === id);
 }
+
+/* ============================================================
+   LOOKBOOK / CAMPAIGN PHOTOGRAPHY
+   ------------------------------------------------------------
+   Empty for now — the grid on the homepage shows a placeholder
+   until this has entries. To add photos once they're ready,
+   just add objects here, e.g.:
+
+   const AETHERIA_GALLERY = [
+     { image: "https://your-image-url.jpg", alt: "Onyx set on a stone vanity" },
+     { image: "https://your-image-url-2.jpg", alt: "Pearl brush detail" },
+   ];
+
+   Nothing else needs to change — script.js reads this array and
+   builds the grid automatically. Add as many as you like.
+   ============================================================ */
+
+const AETHERIA_GALLERY = [];
