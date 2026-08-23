@@ -398,7 +398,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 /* House wordmark shown once, on the first stage only */
 .stage-house-mark {
   position: absolute;
-  top: 34px;
+  top: calc(var(--nav-h) + 22px);
   left: clamp(32px, 6vw, 90px);
   font-family: var(--font-sans);
   font-size: 11px;
@@ -582,6 +582,7 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   padding: clamp(28px, 5vw, 56px);
   display: grid;
   grid-template-rows: auto 1fr auto;
+  padding-top: calc(var(--nav-h) + clamp(12px, 3vw, 24px));
 }
 
 .brand-hero-eyebrow {
@@ -1153,6 +1154,34 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .nav-links { display: none; }
   .nav-burger { display: flex; }
   .stage-nav-index { display: none; }
+
+  /* the desktop hero uses a flexible middle row to anchor the wordmark
+     low against a wide viewport — on a tall phone screen that same
+     flexible row becomes a large empty gap and pushes the wordmark
+     too low, so mobile gets its own compact, controlled composition */
+  .brand-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(22px, 5vh, 36px);
+    text-align: left;
+  }
+  .brand-hero-mark {
+    font-size: clamp(44px, 13vw, 64px);
+    max-width: 100%;
+  }
+  .brand-hero-sub {
+    justify-self: start;
+  }
+  .brand-hero-line,
+  .brand-hero-origin {
+    text-align: left;
+    max-width: 34ch;
+  }
+  .brand-scroll-cue {
+    position: static;
+    margin-top: clamp(16px, 4vh, 28px);
+  }
 
   /* on mobile, a fast flick should be able to sail past a panel rather
      than getting forced to stop at every one — mandatory pacing suits
