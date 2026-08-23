@@ -252,13 +252,6 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   background: var(--ivory);
 }
 
-/* each product gets its own quiet, flat panel tone — a colour
-   identity with zero risk of muddying real photography */
-.product-stage[data-product="onyx"]   .stage-media { background: #EAE2D0; }
-.product-stage[data-product="pearl"]  .stage-media { background: #F0E9DC; }
-.product-stage[data-product="grigio"] .stage-media { background: #E6DFCF; }
-.product-stage[data-product="duo"]    .stage-media { background: #EEE1C9; }
-
 .product-stage .stage-media {
   position: relative;
   overflow: hidden;
@@ -267,6 +260,21 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   justify-content: center;
 }
 
+/* alternate composition: panels 2 and 4 swap which side carries
+   the image, so the journey doesn't repeat one grid four times */
+.product-stage.stage-flip { grid-template-columns: 1fr 1fr; }
+.product-stage.stage-flip .stage-media { order: 2; }
+.product-stage.stage-flip .stage-copy { order: 1; }
+
+/* the product card sits off-centre within its half — placement
+   varies per product rather than every card landing dead-centre */
+.product-stage[data-product="onyx"]   .stage-media { background: #EAE2D0; justify-content: center; }
+.product-stage[data-product="pearl"]  .stage-media { background: #F0E9DC; justify-content: flex-end; padding-right: 8%; }
+.product-stage[data-product="grigio"] .stage-media { background: #E6DFCF; justify-content: flex-start; padding-left: 10%; }
+.product-stage[data-product="duo"]    .stage-media { background: #EEE1C9; justify-content: center; }
+
+.product-stage[data-product="pearl"] .stage-product-figure { align-self: flex-end; margin-bottom: 8%; }
+.product-stage[data-product="grigio"] .stage-product-figure { align-self: flex-start; margin-top: 10%; }
 /* the product photo, presented plainly as a card resting on the panel —
    no blend mode, no masking: the photo is never asked to render
    differently than it actually looks */
@@ -278,6 +286,10 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   transform: scale(1.05) translateY(var(--parallax-y, 0px));
   transition: transform 1500ms var(--ease), opacity 1000ms var(--ease);
   will-change: transform, opacity;
+}
+
+.product-stage[data-product="onyx"] .stage-product-figure {
+  width: min(66%, 500px);
 }
 
 .product-stage.is-active .stage-product-figure {
@@ -404,8 +416,8 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   transform: translateY(-50%);
   z-index: 60;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   color: var(--cream-text);
   mix-blend-mode: difference;
   opacity: 0;
@@ -417,6 +429,29 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   pointer-events: auto;
 }
 
+/* a real progress indicator for the four-part journey, not just labels */
+.stage-progress-track {
+  width: 1px;
+  height: 130px;
+  background: rgba(255,255,255,0.22);
+  position: relative;
+}
+.stage-progress-fill {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 0%;
+  background: #fff;
+  transition: height 120ms linear;
+}
+
+.stage-nav-numbers {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 130px;
+}
+
 .stage-nav-index button {
   font-family: var(--font-sans);
   font-size: 12px;
@@ -426,13 +461,6 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   padding: 4px 0;
 }
 .stage-nav-index button.active { color: #fff; }
-
-.stage-nav-index .rule {
-  width: 1px;
-  height: 18px;
-  background: rgba(255,255,255,0.3);
-  margin: 0 auto;
-}
 
 .scroll-cue {
   position: absolute;
@@ -539,65 +567,91 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
    BRAND HERO — the first thing seen, before the collection
    ============================================================ */
 
+/* ============================================================
+   BRAND HERO — the first thing seen, before the collection.
+   Deliberately asymmetric: an oversized wordmark anchored to
+   the lower-left, eyebrow top-left, subline offset to the
+   right, so it reads as placed rather than centered-and-stacked.
+   ============================================================ */
+
 .brand-hero {
   height: 100vh;
   background: var(--onyx);
   color: var(--cream-text);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   position: relative;
-  padding: 0 24px;
+  padding: clamp(28px, 5vw, 56px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
-.brand-hero-inner { max-width: 640px; }
-
-.brand-hero .eyebrow {
+.brand-hero-eyebrow {
   color: var(--champagne-soft);
-  display: block;
-  margin-bottom: 26px;
+  grid-row: 1;
+  justify-self: start;
 }
 
 .brand-hero-mark {
+  grid-row: 2;
+  align-self: end;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(40px, 7vw, 92px);
-  line-height: 1.02;
-  letter-spacing: -0.01em;
-  margin-bottom: 28px;
+  font-size: clamp(52px, 11vw, 168px);
+  line-height: 0.94;
+  letter-spacing: -0.015em;
+  max-width: 14ch;
+  margin-bottom: clamp(28px, 4vw, 52px);
 }
 
 .brand-hero-line {
+  justify-self: end;
+  text-align: right;
   font-size: 15px;
   color: var(--stone);
-  line-height: 1.7;
-  max-width: 42ch;
-  margin: 0 auto;
+  line-height: 1.65;
+  max-width: 30ch;
+  margin-bottom: 10px;
+}
+
+.brand-hero-origin {
+  display: block;
+  text-align: right;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--champagne-soft);
+}
+
+.brand-hero-sub {
+  grid-row: 3;
+  justify-self: end;
 }
 
 .brand-scroll-cue {
   position: absolute;
-  bottom: 44px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(244,240,229,0.6);
+  bottom: clamp(28px, 5vw, 56px);
+  left: clamp(28px, 5vw, 56px);
+  color: rgba(244,240,229,0.55);
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   transition: color var(--dur-fast) ease;
 }
 .brand-scroll-cue:hover { color: var(--champagne-soft); }
 .brand-scroll-cue .line {
-  width: 1px; height: 30px;
+  width: 30px; height: 1px;
   background: rgba(244,240,229,0.4);
-  animation: cueMove 2.2s var(--ease) infinite;
+  animation: cueMoveHorizontal 2.2s var(--ease) infinite;
 }
+@keyframes cueMoveHorizontal {
+  0%   { transform: scaleX(0); transform-origin: left; opacity: 0; }
+  40%  { transform: scaleX(1); transform-origin: left; opacity: 1; }
+  60%  { transform: scaleX(1); transform-origin: right; opacity: 1; }
+  100% { transform: scaleX(0); transform-origin: right; opacity: 0; }
+}
+
 
 /* ============================================================
    COMING SOON — teaser after the collection journey
@@ -605,26 +659,44 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 
 .coming-soon {
   background: var(--ivory);
-  text-align: center;
-  padding: clamp(80px, 11vw, 130px) 24px;
   border-bottom: 1px solid var(--stone-line);
+  padding: clamp(70px, 9vw, 110px) clamp(24px, 6vw, 90px);
+  display: flex;
+  align-items: baseline;
+  gap: clamp(24px, 5vw, 64px);
 }
-.coming-soon .eyebrow { color: var(--champagne); margin-bottom: 20px; display: block; }
+.coming-soon-num {
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-style: italic;
+  font-size: clamp(64px, 9vw, 120px);
+  line-height: 1;
+  color: var(--stone-line);
+  -webkit-text-stroke: 1px var(--champagne);
+  color: transparent;
+  flex-shrink: 0;
+}
+.coming-soon-copy { max-width: 52ch; }
+.coming-soon .eyebrow { color: var(--champagne); margin-bottom: 18px; display: block; }
 .coming-soon h2 {
   font-family: var(--font-display);
   font-weight: 400;
   font-style: italic;
-  font-size: clamp(24px, 3.4vw, 38px);
-  margin-bottom: 18px;
+  font-size: clamp(22px, 3vw, 34px);
+  margin-bottom: 14px;
+  line-height: 1.2;
 }
 .coming-soon p {
   font-size: 14px;
   color: #6b665a;
   max-width: 46ch;
-  margin: 0 auto;
   line-height: 1.7;
 }
 
+@media (max-width: 700px) {
+  .coming-soon { flex-direction: column; gap: 20px; text-align: left; }
+  .coming-soon-num { font-size: 56px; }
+}
 /* ============================================================
    LOOKBOOK — campaign photography, populated from data.js
    ============================================================ */
@@ -782,21 +854,21 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
 
 .journal-section {
   background: var(--ivory-deep);
-  padding: clamp(90px, 12vw, 150px) clamp(20px, 5vw, 70px);
+  padding: clamp(56px, 7vw, 90px) clamp(20px, 5vw, 70px);
   text-align: center;
 }
-.journal-section .eyebrow { color: var(--champagne); margin-bottom: 20px; }
+.journal-section .eyebrow { color: var(--champagne); margin-bottom: 14px; }
 .journal-section h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(28px, 3.6vw, 42px);
-  margin-bottom: 20px;
+  font-size: clamp(22px, 2.6vw, 30px);
+  margin-bottom: 14px;
 }
 .journal-section p {
   max-width: 44ch;
   margin: 0 auto;
   color: #5b564c;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -1082,14 +1154,33 @@ body:not(.curtain-lifted) .product-stage.is-active .discover-link {
   .nav-burger { display: flex; }
   .stage-nav-index { display: none; }
 
+  /* on mobile, a fast flick should be able to sail past a panel rather
+     than getting forced to stop at every one — mandatory pacing suits
+     the deliberate desktop scroll, not a thumb-scrolled phone */
+  .collection-experience { scroll-snap-type: y proximity; }
   .product-stage {
+    scroll-snap-stop: normal;
     grid-template-columns: 1fr;
     grid-template-rows: 56% 44%;
+    min-height: 640px;
   }
+  .product-stage.stage-flip .stage-media,
+  .product-stage.stage-flip .stage-copy { order: initial; }
   .stage-copy { padding: 34px 22px 40px; }
   .stage-copy .stage-name { font-size: clamp(34px, 9vw, 50px); }
   .stage-house-mark { top: 20px; }
-  .stage-product-figure { width: min(72%, 320px); }
+  .stage-product-figure,
+  .product-stage[data-product="onyx"] .stage-product-figure { width: min(72%, 320px); }
+  .product-stage[data-product="pearl"] .stage-media,
+  .product-stage[data-product="grigio"] .stage-media {
+    justify-content: center;
+    padding-left: 0; padding-right: 0;
+  }
+  .product-stage[data-product="pearl"] .stage-product-figure,
+  .product-stage[data-product="grigio"] .stage-product-figure {
+    align-self: center;
+    margin: 0;
+  }
 
   .house-origin { flex-wrap: wrap; gap: 30px; }
 
