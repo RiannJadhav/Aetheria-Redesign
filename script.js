@@ -197,6 +197,8 @@ function initParallax() {
   const PARALLAX_STRENGTH = 0.14; // fraction of scroll delta the image drifts by
   let ticking = false;
 
+  const progressFill = document.querySelector("[data-progress-fill]");
+
   const apply = () => {
     ticking = false;
     const viewportMid = stage.scrollTop + stage.clientHeight / 2;
@@ -211,6 +213,12 @@ function initParallax() {
       figure.style.setProperty("--parallax-y", `${clamped}px`);
       panel.classList.add("parallax-live");
     });
+
+    if (progressFill) {
+      const maxScroll = stage.scrollHeight - stage.clientHeight;
+      const pct = maxScroll > 0 ? Math.min(100, Math.max(0, (stage.scrollTop / maxScroll) * 100)) : 0;
+      progressFill.style.height = `${pct}%`;
+    }
   };
 
   const onScroll = () => {
